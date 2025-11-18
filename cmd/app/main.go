@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
+	"psql_crud/internal/config"
 )
 
 const (
@@ -13,11 +13,12 @@ const (
 )
 
 func main() {
-	fmt.Printf("hello")
 
-	// TODO: CONFIG
+	cfg := config.MustLoad()
 
-	logger := initLogger()
+	logger := initLogger(cfg.Env)
+	logger.Info("Initializing service", slog.String("env", cfg.Env))
+	logger.Debug("Showing debug messages")
 }
 
 func initLogger(env string) *slog.Logger {
