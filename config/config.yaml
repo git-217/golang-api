@@ -4,3 +4,9 @@ psql_params:
   pg_password: admin1111
   pg_db: urls_db
   pg_port: 5422
+  ssl_mode: disable
+  max_conns: 20
+  min_conns: 5
+  conn_life_h: 1
+  comm_idle_m: 1
+  pg_host: 127.0.0.1
