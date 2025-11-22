@@ -1,4 +1,4 @@
-package database
+package pool
 
 import (
 	"context"
