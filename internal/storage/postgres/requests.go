@@ -1,15 +1,15 @@
 package postgres
 
 import (
+	"context"
+	"fmt"
 	"psql_crud/internal/storage"
 	"time"
-	"fmt"
-	"context"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-
 
 type CustomURL struct {
 	Id    string `json:"id"`
@@ -28,7 +28,6 @@ func NewURLRepo(pool *pgxpool.Pool) *URLRepo {
 func (r *URLRepo) SaveURL(ctx context.Context, urlToSave string, alias string) (int, error) {
 	const op = "internal.storage.postgres.SaveURL"
 
-	time.Sleep(5*time.Second)
 	var id int
 	err := r.pool.QueryRow(ctx, `INSERT INTO urls(original_url, alias) 
 								values ($1, $2)
@@ -67,32 +66,25 @@ func (r *URLRepo) GetURL(ctx context.Context, alias string) (*CustomURL, error) 
 func (r *URLRepo) DeleteURL(ctx context.Context, alias string) error {
 	const op = "internal.storage.postgres.DeleteURL"
 
-	tx, err := r.pool.Begin(ctx)
+	cmd, err := r.pool.Exec(ctx, `DELETE FROM urls WHERE alias=$1`, alias)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
-	defer tx.Rollback(ctx)
-
-	_, err = tx.Exec(ctx, `DELETE FROM urls WHERE alias=$1`, alias)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+	if cmd.RowsAffected() == 0 {
+		return fmt.Errorf("%s: %w", op, storage.ErrURLNotFound)
 	}
-	return tx.Commit(ctx)
+	return nil
 }
 
 func (r *URLRepo) UpdateURLAlias(ctx context.Context, old_alias string, new_alias string) error {
 	const op = "internal.storage.postgres.UpdateURLAlias"
 
-	update_time := time.Now().Format("2006-01-02 15:04:05")
+	update_time := time.Now().Format(time.Now().String())
 
-	tx, err := r.pool.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
-	defer tx.Rollback(ctx)
-
-	_, err = tx.Exec(ctx,
-		`UPDATE urls SET (alias=$1, updated_at=$2) WHERE alias=$3`,
+	_, err := r.pool.Exec(ctx,
+		`UPDATE urls 
+		SET alias = $1, updated_at = $2 
+		WHERE alias = $3`,
 		new_alias,
 		update_time,
 		old_alias,
@@ -100,5 +92,5 @@ func (r *URLRepo) UpdateURLAlias(ctx context.Context, old_alias string, new_alia
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
-	return tx.Commit(ctx)
+	return nil
 }
