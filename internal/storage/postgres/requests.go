@@ -81,7 +81,7 @@ func (r *URLRepo) UpdateURLAlias(ctx context.Context, old_alias string, new_alia
 
 	update_time := time.Now().Format(time.Now().String())
 
-	_, err := r.pool.Exec(ctx,
+	cmd, err := r.pool.Exec(ctx,
 		`UPDATE urls 
 		SET alias = $1, updated_at = $2 
 		WHERE alias = $3`,
@@ -91,6 +91,9 @@ func (r *URLRepo) UpdateURLAlias(ctx context.Context, old_alias string, new_alia
 	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
+	}
+	if cmd.RowsAffected() == 0 {
+		return fmt.Errorf("%s: %w", op, storage.ErrURLNotFound)
 	}
 	return nil
 }
