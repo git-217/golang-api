@@ -79,7 +79,7 @@ func (r *URLRepo) DeleteURL(ctx context.Context, alias string) error {
 func (r *URLRepo) UpdateURLAlias(ctx context.Context, old_alias string, new_alias string) error {
 	const op = "internal.storage.postgres.UpdateURLAlias"
 
-	update_time := time.Now().Format(time.Now().String())
+	update_time := time.Now()
 
 	cmd, err := r.pool.Exec(ctx,
 		`UPDATE urls 
