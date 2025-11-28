@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func InitUrlTable(ctx context.Context, pool *pgxpool.Pool) error {
+func New(ctx context.Context, pool *pgxpool.Pool) error {
 	const op = "interanl.database.postgres.InitUrlTable"
 	query := `
 		CREATE TABLE IF NOT EXISTS urls (

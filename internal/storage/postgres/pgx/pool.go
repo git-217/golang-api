@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewPool(ctx context.Context, cfg *config.Config) (*pgxpool.Pool, error) {
+func New(ctx context.Context, cfg *config.Config) (*pgxpool.Pool, error) {
 	const op = "internal.repository.repository.NewPool"
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",

@@ -37,7 +37,7 @@ func (r *URLRepo) SaveURL(ctx context.Context, urlToSave string, alias string) (
 	if err != nil {
 		if pgerr, ok := err.(*pgconn.PgError); ok {
 			if pgerr.Code == "23505" {
-				return 0, fmt.Errorf("%s: %w", op, storage.ErrURLExists)
+				return 0, fmt.Errorf("%s: %w", op, storage.ErrAliasExists)
 			}
 		}
 		return 0, fmt.Errorf("%s: failed to save url. %s: %w", op, urlToSave, err)
