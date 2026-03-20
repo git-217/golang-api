@@ -25,9 +25,9 @@ func Error(msg string) Response {
 	return Response{Status: StatusError, Error: msg}
 }
 
-func ValidationError(errs validator.ValidationErrors) Response{
+func ValidationError(errs validator.ValidationErrors) Response {
 	var errMsgs []string
-	for _, err := range errs{
+	for _, err := range errs {
 		switch err.ActualTag() {
 		case "required":
 			errMsgs = append(errMsgs, fmt.Sprintf("Missing required field: %s", err.Field()))
@@ -40,6 +40,6 @@ func ValidationError(errs validator.ValidationErrors) Response{
 
 	return Response{
 		Status: StatusError,
-		Error: strings.Join(errMsgs, ", "),
+		Error:  strings.Join(errMsgs, ", "),
 	}
 }
