@@ -9,7 +9,7 @@ import (
 	"psql_crud/internal/lib/logger/sl"
 	"psql_crud/internal/lib/random"
 	"psql_crud/internal/storage"
-	db_req "psql_crud/internal/storage/postgres"
+	"strings"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -33,7 +33,6 @@ const (
 
 type URLSaver interface {
 	SaveURL(ctx context.Context, urlToSave string, alias string) (int, error)
-	GetURL(ctx context.Context, alias string) (*db_req.CustomURL, error)
 }
 
 func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
@@ -53,6 +52,12 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			render.JSON(w, r, resp.Error("failed to decode request"))
 
 			return
+		}
+
+		if !strings.HasPrefix(req.URL, "https://") {
+			lg.Info("URL without protocol")
+
+			render.JSON(w, r, resp.Error("URL must starts with 'https://'"))
 		}
 
 		lg.Info("request body decoded", slog.Any("request", req))
