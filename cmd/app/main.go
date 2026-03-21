@@ -65,14 +65,14 @@ func main() {
 	router.Delete("/{alias}", del.One(logger, repo))
 
 	server := &http.Server{
-		Addr:         cfg.Http_server.Address,
+		Addr:         cfg.HttpServer.Address,
 		Handler:      router,
-		ReadTimeout:  cfg.Http_server.IdleTimeout,
-		WriteTimeout: cfg.Http_server.Timeout,
-		IdleTimeout:  cfg.Http_server.IdleTimeout,
+		ReadTimeout:  cfg.HttpServer.IdleTimeout,
+		WriteTimeout: cfg.HttpServer.Timeout,
+		IdleTimeout:  cfg.HttpServer.IdleTimeout,
 	}
 	go func() {
-		logger.Info("starting server", slog.String("address", cfg.Http_server.Address))
+		logger.Info("starting server", slog.String("address", cfg.HttpServer.Address))
 		if err := server.ListenAndServe(); err != nil {
 			logger.Error("failed to run server", sl.Err(err))
 		}
@@ -84,8 +84,8 @@ func main() {
 
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdownCancel()
-	
-	if err := server.Shutdown(shutdownCtx); err!=nil{
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
 		logger.Error("shutdown failed", sl.Err(err))
 	} else {
 		logger.Info("server stopped correctly")
