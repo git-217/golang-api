@@ -5,7 +5,10 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
 	"psql_crud/internal/config"
+	"psql_crud/internal/http-server/handlers/redirect"
+	del "psql_crud/internal/http-server/handlers/url/delete"
 	"psql_crud/internal/http-server/handlers/url/save"
 	mwLog "psql_crud/internal/http-server/middleware/logger"
 	"psql_crud/internal/lib/logger/handlers/slogpretty"
@@ -13,6 +16,8 @@ import (
 	"psql_crud/internal/storage/postgres"
 	db_req "psql_crud/internal/storage/postgres"
 	pool "psql_crud/internal/storage/postgres/pgx"
+	"syscall"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -29,15 +34,16 @@ func main() {
 	cfg := config.MustLoad()
 
 	logger := initLogger(cfg.Env)
-	logger.Info("Initializing service", slog.String("env", cfg.Env))
-	logger.Debug("Showing debug messages")
+	logger.Info("initializing service", slog.String("env", cfg.Env))
+	logger.Debug("showing debug messages")
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
 	dbPool, err := pool.New(ctx, cfg)
 	if err != nil {
 		logger.Error("Failed to init pool", sl.Err(err))
+		os.Exit(1)
 	}
 	defer dbPool.Close()
 
@@ -48,7 +54,6 @@ func main() {
 	repo := db_req.NewURLRepo(dbPool)
 
 	router := chi.NewRouter()
-
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger)
 	router.Use(mwLog.New(logger))
@@ -56,8 +61,8 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	router.Post("/url/new", save.New(logger, repo))
-
-	logger.Info("starging server", slog.String("address", cfg.Http_server.Address))
+	router.Get("/{alias}", redirect.New(logger, repo))
+	router.Delete("/{alias}", del.One(logger, repo))
 
 	server := &http.Server{
 		Addr:         cfg.Http_server.Address,
@@ -66,11 +71,25 @@ func main() {
 		WriteTimeout: cfg.Http_server.Timeout,
 		IdleTimeout:  cfg.Http_server.IdleTimeout,
 	}
+	go func() {
+		logger.Info("starting server", slog.String("address", cfg.Http_server.Address))
+		if err := server.ListenAndServe(); err != nil {
+			logger.Error("failed to run server", sl.Err(err))
+		}
+		logger.Error("server listen error")
+	}()
 
-	if err := server.ListenAndServe(); err != nil {
-		logger.Error("failed to run server", sl.Err(err))
+	<-ctx.Done()
+	logger.Info("shutting down server")
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer shutdownCancel()
+	
+	if err := server.Shutdown(shutdownCtx); err!=nil{
+		logger.Error("shutdown failed", sl.Err(err))
+	} else {
+		logger.Info("server stopped correctly")
 	}
-	logger.Error("server stopped")
 }
 
 func initLogger(env string) *slog.Logger {
