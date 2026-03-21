@@ -41,6 +41,7 @@ func New(logger *slog.Logger, urlRepo urlGetter) http.HandlerFunc {
 			lg.Info("url not found")
 
 			render.JSON(w, r, resp.Error("URL not found"))
+			return 
 		}
 
 		if err != nil {
