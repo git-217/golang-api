@@ -58,6 +58,8 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			lg.Info("URL without protocol")
 
 			render.JSON(w, r, resp.Error("URL must starts with 'https://'"))
+
+			return
 		}
 
 		lg.Info("request body decoded", slog.Any("request", req))
@@ -71,9 +73,8 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		}
 
 		alias := req.Alias
-		var attempt int
 
-		for attempt := 0; attempt < maxGenAttempts; attempt++ {
+		for range maxGenAttempts {
 			if alias == "" {
 				alias = random.NewRandomString(aliasLength)
 			}
@@ -83,6 +84,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			if err == nil {
 				lg.Info("url added", slog.Int("id", id))
 				responseOK(w, r, alias)
+				return
 			}
 
 			if errors.Is(err, storage.ErrAliasExists) {
@@ -101,10 +103,9 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			render.JSON(w, r, resp.Error("failed to save URL"))
 			return
 		}
-		if attempt >= maxGenAttempts {
-			lg.Error("max attempts reached for generating unique alias")
-			render.JSON(w, r, resp.Error("failed to generate unique alias"))
-		}
+		lg.Error("max attempts reached for generating unique alias")
+		render.JSON(w, r, resp.Error("failed to generate unique alias"))
+
 	}
 }
 
