@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	Env         string     `yaml:"env" env-default:"local"`
-	PsqlConn    pgParams   `yaml:"psql_params"`
-	Http_server HTTPServer `yaml:"http_server"`
+	Env         string      `yaml:"env" env-default:"local"`
+	PsqlConn    pgParams    `yaml:"psql_params"`
+	HttpServer  HTTPServer  `yaml:"http_server"`
+	RateLimiter RateLimiter `yaml:"rate_limiter"`
 }
 
 type HTTPServer struct {
@@ -33,6 +34,11 @@ type pgParams struct {
 	MinConns int32  `yaml:"min_conns" env-default:"5"`
 	ConnLife int32  `yaml:"conn_life_h" env-default:"1"`
 	ConnIdle int32  `yaml:"conn_idle_m" env-default:"1"`
+}
+
+type RateLimiter struct {
+	MaxTokens  float64 `yaml:"max_tokens" env-default:"30"`
+	RefillRate float64 `yaml:"refill_rate" env-default:"15"`
 }
 
 func MustLoad() *Config {

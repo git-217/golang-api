@@ -16,3 +16,6 @@ http_server:
   idle_timeout: 30s
   user: "noname11"
   password: 1111
+rate_limiter:
+  max_tokens: 30
+  refill_rate: 15
