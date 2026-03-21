@@ -31,15 +31,16 @@ func One(log *slog.Logger, repo URLRepo) http.HandlerFunc {
 		if alias == "" {
 			lg.Info("empty alias")
 
-			render.JSON(w, r, response.Error("url cannot be empty"))
+			render.JSON(w, r, response.Error("url can't be empty"))
 			return
 		}
 
 		err := repo.DeleteURL(r.Context(), alias)
 		if err != nil {
-			lg.Error("cannot delete url", sl.Err(err))
+			lg.Error("can't delete url", sl.Err(err))
 
 			render.JSON(w, r, response.Error("internal error"))
+			return
 		}
 
 		lg.Info("url deleted successfully")
