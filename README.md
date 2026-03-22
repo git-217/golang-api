@@ -15,13 +15,12 @@
 - **База данных:** PostgreSQL (pgx)
 - **HTTP-сервер:** Chi router
 - **Логирование:** Slog
+- **Тесты:** testify, httptets 
 
 ### Запуск
 
 ```bash
 docker compose up -d
-
-go run cmd/app/main.go
 ```
 
 ### API Endpoints
