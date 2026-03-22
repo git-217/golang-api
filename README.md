@@ -19,7 +19,7 @@
 ### Запуск
 
 ```bash
-docker-compose up -d
+docker compose up -d
 
 go run cmd/app/main.go
 ```
