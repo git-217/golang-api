@@ -138,7 +138,6 @@ func TestNew_EmptyAlias_ReturnsError(t *testing.T) {
 
 	handler(w, req)
 
-	// Assert
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), "Invalid request")
 	assert.Equal(t, 0, mockGetter.call, "GetURL should not be called with empty alias")
@@ -157,7 +156,6 @@ func TestNew_URLNotFound_ReturnsError(t *testing.T) {
 
 	handler(w, req)
 
-	// Assert
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), "URL not found")
 	assert.Equal(t, 1, mockGetter.call)
