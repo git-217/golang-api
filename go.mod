@@ -1,4 +1,4 @@
-module psql_crud
+module github.com/git-217/golang-api
 
 go 1.24.4
 
