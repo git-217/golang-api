@@ -3,7 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"psql_crud/internal/storage"
+	"github.com/git-217/golang-api/internal/storage"
 	"time"
 
 	"github.com/jackc/pgx/v5"

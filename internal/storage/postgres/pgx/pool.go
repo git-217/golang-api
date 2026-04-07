@@ -3,7 +3,7 @@ package pool
 import (
 	"context"
 	"fmt"
-	"psql_crud/internal/config"
+	"github.com/git-217/golang-api/internal/config"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"

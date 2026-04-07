@@ -3,7 +3,7 @@ package limiter
 import (
 	"net"
 	"net/http"
-	"psql_crud/internal/lib/limiter"
+	"github.com/git-217/golang-api/internal/lib/limiter"
 )
 
 func RateLimiterMiddleware(ipLimiter *limiter.IPRateLimiter) func(next http.Handler) http.Handler {

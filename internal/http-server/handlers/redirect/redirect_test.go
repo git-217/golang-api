@@ -9,8 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"psql_crud/internal/storage"
-	db_req "psql_crud/internal/storage/postgres"
+	"github.com/git-217/golang-api/internal/storage"
+	db_req "github.com/git-217/golang-api/internal/storage/postgres"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"

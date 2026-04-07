@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"psql_crud/internal/lib/api/response"
-	"psql_crud/internal/lib/logger/sl"
+	"github.com/git-217/golang-api/internal/lib/api/response"
+	"github.com/git-217/golang-api/internal/lib/logger/sl"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

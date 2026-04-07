@@ -1,7 +1,7 @@
 package limiter
 
 import (
-	"psql_crud/internal/config"
+	"github.com/git-217/golang-api/internal/config"
 	"sync"
 )
 
